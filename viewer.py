@@ -7,6 +7,7 @@ from google_images_download import google_images_download
 
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QPlainTextEdit, QHBoxLayout, QLabel
 from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import Qt
 
 
 class Viewer(QApplication):
@@ -18,7 +19,8 @@ class Viewer(QApplication):
         Buttons = QHBoxLayout()
 
         self.btn_Random = QPushButton("RANDDM")
-        self.btn_Random.clicked.connect(lambda: self.changeView(random.choice(range(len(self.database)))))
+        self.btn_Random.clicked.connect(lambda: self.changeView(
+            random.choice(range(len(self.database)))))
         nav_r = QPushButton('<-')
         nav_r.clicked.connect(lambda: self.cycleDatabaseIndex(-1))
         Buttons.addWidget(nav_r)
@@ -30,12 +32,12 @@ class Viewer(QApplication):
         Buttons.addWidget(nav_l)
 
         self.Image = QLabel()
+        self.Image.setFixedSize(800, 600)
         self.textBox = QPlainTextEdit()
         layout.addWidget(self.Image)
         layout.addWidget(self.textBox)
 
         layout.addLayout(Buttons)
-
 
         window.setLayout(layout)
 
@@ -44,12 +46,17 @@ class Viewer(QApplication):
         self.imagesFolder = "Images"
         self.database = json.load(open("fodmap_list/fodmap_repo.json"))
 
-
-
         self.exec_()
 
     def cycleDatabaseIndex(self, Value):
-        targetIdx = int(self.data["id"]) -1 + Value
+
+        # Checando se a variavel data existe.
+        if not 'data' in dir(Viewer):
+            print("Nao tem")
+            self.changeView(random.randint(0, 99))
+
+        targetIdx = int(self.data["id"]) - 1 + Value
+        print("print ID", targetIdx)
         self.changeView(targetIdx)
 
     def changeView(self, viewIndex):
@@ -66,7 +73,8 @@ class Viewer(QApplication):
             filename = os.path.join(folderPath, os.listdir(folderPath)[0])
         pixmap = QPixmap(filename)
 
-        self.Image.setPixmap(pixmap.scaled(800, 600))
+        self.Image.setPixmap(pixmap.scaledToHeight(
+            600, Qt.TransformationMode(Qt.FastTransformation)))
         self.Image.resize(200, 100)
 
     def downloadImage(self, keyword):
