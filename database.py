@@ -11,7 +11,7 @@ from PyQt5.QtCore import Qt
 
 import collections
 import threading
-
+import time
 
 class DatabaseManager():
     def __init__(self):
@@ -27,12 +27,6 @@ class DatabaseManager():
         n = threading.Thread(target=self.imageCacheControl)
         n.start()
 
-
-    """
-
-    This should run countinuously in the background, keeping the cache filled.
-
-    """
     def getCurrentData(self):
         return self.database[self.currentIndex]
 
@@ -41,14 +35,22 @@ class DatabaseManager():
             cacheEntry = self.cachedImages.pop()
             self.currentIndex = cacheEntry
 
+    """
+
+    This should run countinuously in the background, keeping the cache filled.
+
+    """
     def imageCacheControl(self):
-        while len(self.cachedImages) <= self.maxCachedImages:
-            viewIndex = random.randrange(len(self.database))
-            data = self.database[viewIndex]
-            imageName = self.nameToImageName(data['name'])
-            IMG = self.downloadImage(imageName)
-            cacheEntryIndex = viewIndex
-            self.cachedImages.append(cacheEntryIndex)
+        while True:
+            if len(self.cachedImages) <= self.maxCachedImages:
+                viewIndex = random.randrange(len(self.database))
+                data = self.database[viewIndex]
+                imageName = self.nameToImageName(data['name'])
+                IMG = self.downloadImage(imageName)
+                cacheEntryIndex = viewIndex
+                self.cachedImages.append(cacheEntryIndex)
+            else:
+                time.sleep(4)
 
     def nameToImageName(self, name):
         return name.replace(",", "").replace("/", "")
@@ -71,7 +73,8 @@ class DatabaseManager():
         }
 
         paths = image.download(arguments)
-        print(paths)
+        imagePath = paths[keyword][0]
+        print("Downloaded %s" % imagePath)
         return paths
 
 
