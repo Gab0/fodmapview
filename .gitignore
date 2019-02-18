@@ -69,9 +69,10 @@ target/
 
 # Workspace Vscode
 .vscode
-Software.code-workspace
+*.code-workspace
 *.html
 *.pdf
+tempCodeRunnerFile.py
 
 # File Teste
-main2.py
+fodmap_list/
