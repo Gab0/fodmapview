@@ -51,11 +51,12 @@ class Viewer(QApplication):
     def cycleDatabaseIndex(self, Value):
 
         # Checando se a variavel data existe.
-        if not 'data' in dir(Viewer):
+        try:
+            print(self.data['id'])
+            targetIdx = int(self.data["id"]) - 1 + Value
+            self.changeView(targetIdx)
+        except:
             self.changeView(random.randint(0, 99))
-
-        targetIdx = int(self.data["id"]) - 1 + Value
-        self.changeView(targetIdx)
 
     def changeView(self, viewIndex):
         self.data = self.database[viewIndex]
