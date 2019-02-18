@@ -52,11 +52,9 @@ class Viewer(QApplication):
 
         # Checando se a variavel data existe.
         if not 'data' in dir(Viewer):
-            print("Nao tem")
             self.changeView(random.randint(0, 99))
 
         targetIdx = int(self.data["id"]) - 1 + Value
-        print("print ID", targetIdx)
         self.changeView(targetIdx)
 
     def changeView(self, viewIndex):
