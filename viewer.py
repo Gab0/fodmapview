@@ -7,6 +7,7 @@ from google_images_download import google_images_download
 
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QPlainTextEdit, QHBoxLayout, QLabel
 from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import Qt
 
 
 class Viewer(QApplication):
@@ -31,6 +32,7 @@ class Viewer(QApplication):
         Buttons.addWidget(nav_l)
 
         self.Image = QLabel()
+        self.Image.setFixedSize(800, 600)
         self.textBox = QPlainTextEdit()
         layout.addWidget(self.Image)
         layout.addWidget(self.textBox)
@@ -71,7 +73,8 @@ class Viewer(QApplication):
             filename = os.path.join(folderPath, os.listdir(folderPath)[0])
         pixmap = QPixmap(filename)
 
-        self.Image.setPixmap(pixmap.scaled(800, 600))
+        self.Image.setPixmap(pixmap.scaledToHeight(
+            600, Qt.TransformationMode(Qt.FastTransformation)))
         self.Image.resize(200, 100)
 
     def downloadImage(self, keyword):
