@@ -18,7 +18,8 @@ class Viewer(QApplication):
         Buttons = QHBoxLayout()
 
         self.btn_Random = QPushButton("RANDDM")
-        self.btn_Random.clicked.connect(lambda: self.changeView(random.choice(range(len(self.database)))))
+        self.btn_Random.clicked.connect(lambda: self.changeView(
+            random.choice(range(len(self.database)))))
         nav_r = QPushButton('<-')
         nav_r.clicked.connect(lambda: self.cycleDatabaseIndex(-1))
         Buttons.addWidget(nav_r)
@@ -36,7 +37,6 @@ class Viewer(QApplication):
 
         layout.addLayout(Buttons)
 
-
         window.setLayout(layout)
 
         window.show()
@@ -44,12 +44,17 @@ class Viewer(QApplication):
         self.imagesFolder = "Images"
         self.database = json.load(open("fodmap_list/fodmap_repo.json"))
 
-
-
         self.exec_()
 
     def cycleDatabaseIndex(self, Value):
-        targetIdx = int(self.data["id"]) -1 + Value
+
+        # Checando se a variavel data existe.
+        if not 'data' in dir(Viewer):
+            print("Nao tem")
+            self.changeView(random.randint(0, 99))
+
+        targetIdx = int(self.data["id"]) - 1 + Value
+        print("print ID", targetIdx)
         self.changeView(targetIdx)
 
     def changeView(self, viewIndex):
