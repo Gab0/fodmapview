@@ -9,18 +9,29 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QPl
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt
 
+from database import DatabaseManager
+
 
 class Viewer(QApplication):
     def __init__(self):
         QApplication.__init__(self, [])
-        window = QWidget()
+
+        self.database = DatabaseManager()
+        self.buildInterface()
+        self.exec_()
+
+    def btn_random(self):
+        self.database.loadRandom()
+        self.changeView()
+
+    def buildInterface(self):
+        self.window = QWidget()
         layout = QVBoxLayout()
 
         Buttons = QHBoxLayout()
 
         self.btn_Random = QPushButton("RANDDM")
-        self.btn_Random.clicked.connect(lambda: self.changeView(
-            random.choice(range(len(self.database)))))
+        self.btn_Random.clicked.connect(self.btn_random)
         nav_r = QPushButton('<-')
         nav_r.clicked.connect(lambda: self.cycleDatabaseIndex(-1))
         Buttons.addWidget(nav_r)
@@ -39,55 +50,34 @@ class Viewer(QApplication):
 
         layout.addLayout(Buttons)
 
-        window.setLayout(layout)
+        self.window.setLayout(layout)
 
-        window.show()
-
-        self.imagesFolder = "Images"
-        self.database = json.load(open("fodmap_list/fodmap_repo.json"))
-
-        self.exec_()
+        self.window.show()
 
     def cycleDatabaseIndex(self, Value):
 
         # Checando se a variavel data existe.
         try:
             print(self.data['id'])
-            targetIdx = int(self.data["id"]) - 1 + Value
-            self.changeView(targetIdx)
+            self.database.currentIndex += Value
+            self.changeView()
         except:
-            self.changeView(random.randint(0, 99))
+            self.database.currentIndex = random.randint(0, 99)
+            self.changeView()
 
-    def changeView(self, viewIndex):
-        self.data = self.database[viewIndex]
-        self.showImage(self.data['name'].replace(",", "").replace("/", ""))
-
-        self.textBox.setPlainText(json.dumps(self.data, indent=4))
+    def changeView(self):
+        data = self.database.getCurrentData()
+        imageName = self.database.nameToImageName(data["name"])
+        self.showImage(imageName)
+        self.textBox.setPlainText(json.dumps(data, indent=4))
 
     def showImage(self, imageName):
-        folderPath = os.path.join(self.imagesFolder, imageName)
-        if not os.path.isdir(folderPath):
-            filename = self.downloadImage(imageName)[imageName][0]
-        else:
-            filename = os.path.join(folderPath, os.listdir(folderPath)[0])
+        filename = self.database.getImageFilename(imageName)
         pixmap = QPixmap(filename)
 
         self.Image.setPixmap(pixmap.scaledToHeight(
             600, Qt.TransformationMode(Qt.FastTransformation)))
         self.Image.resize(200, 100)
-
-    def downloadImage(self, keyword):
-        image = google_images_download.googleimagesdownload()
-
-        arguments = {
-            "keywords": keyword,
-            "limit": 1,
-            "output_directory": self.imagesFolder
-        }
-
-        paths = image.download(arguments)
-        print(paths)
-        return paths
 
 
 a = Viewer()
