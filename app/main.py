@@ -11,11 +11,12 @@ from database import DatabaseManager
 
 import json
 
+
 class Viewer(GridLayout):
-    def __init__(self):
+    def __init__(self, dataDirectory=None):
         super(Viewer, self).__init__()
 
-        self.database = DatabaseManager()
+        self.database = DatabaseManager(dataDirectory=dataDirectory, Async=False)
         self.buildInterface()
 
     def buildInterface(self):
@@ -23,7 +24,7 @@ class Viewer(GridLayout):
         self.rows = 3
 
         self.showText = TextInput(multiline=True)
-        self.random_button = Button(text="RANDOM", on_press=lambda a:self.randomEntry())
+        self.random_button = Button(text="RANDOM", on_press=lambda a: self.randomEntry())
         self.Image = Image()
 
         # ADDING WIDGETS
@@ -37,16 +38,21 @@ class Viewer(GridLayout):
 
     def changeView(self):
         data = self.database.getCurrentData()
-        imageName = self.database.nameToImageName(data["name"])
-        filename = self.database.getImageFilename(imageName)
-        self.Image.source = filename
-        self.Image.reload()
+        try:
+            imageName = self.database.nameToImageName(data["name"])
+            filename = self.database.getImageFilename(imageName)
+            self.Image.source = filename
+            self.Image.reload()
+        except Exception as e:
+            print("Failure to connect")
+            print(str(e))
         self.showText.text = json.dumps(data, indent=2)
 
-class theApp(App):
+
+class fodmapApp(App):
     def build(self):
-        return Viewer()
+        return Viewer(dataDirectory=self.user_data_dir)
 
 
 if __name__ == "__main__":
-    theApp().run()
+    fodmapApp().run()
