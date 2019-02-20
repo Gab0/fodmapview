@@ -9,6 +9,8 @@ verify_ssl = true
 google-images-download = "==2.5.0"
 Kivy = "==1.10.1"
 PyQt5 = "==5.12"
+python-for-android = "*"
+buildozer = "*"
 
 [requires]
 python_version = "3.6"
