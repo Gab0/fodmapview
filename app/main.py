@@ -86,9 +86,9 @@ class AttributeViewer(GridLayout):
         cM = 0.8
 
         ballColorMap = {
-            0: (cm, cM, cm), # GREEN
-            1: (cm, cM, cM), # YELLOW
-            2: (cM, cm, cm)  # RED
+            0: (cm, cM, cm),  # GREEN
+            1: (cM, cM, cm),  # YELLOW
+            2: (cM, cm, cm)   # RED
         }
         for k in self.coloredSpheres.keys():
             try:
@@ -113,14 +113,19 @@ class Viewer(GridLayout):
         self.showText = TextInput(multiline=True)
         self.random_button = Button(text="RANDOM", on_press=lambda a: self.randomEntry())
         self.Image = Image()
-
+        self.Image.on_touch_down = lambda a: self.toggleImage()
         self.foodView = AttributeViewer()
+
+        self.showImage = 1
 
         # ADDING WIDGETS
         self.add_widget(self.Image)
         #self.add_widget(self.showText)
         self.add_widget(self.foodView)
         self.add_widget(self.random_button)
+
+    def toggleImage(self):
+        self.showImage = 1 - self.showImage
 
     def randomEntry(self):
         self.database.loadRandom()
@@ -129,10 +134,14 @@ class Viewer(GridLayout):
     def changeView(self):
         data = self.database.getCurrentData()
         try:
-            imageName = self.database.nameToImageName(data["name"])
-            filename = self.database.getImageFilename(imageName)
-            self.Image.source = filename
-            self.Image.reload()
+            if self.showImage:
+                imageName = self.database.nameToImageName(data["name"])
+                filename = self.database.getImageFilename(imageName)
+                self.Image.source = filename
+                self.Image.reload()
+            else:
+                self.Image.source= ""
+                self.Image.reload()
         except Exception as e:
             print("Failure to connect")
             print(str(e))

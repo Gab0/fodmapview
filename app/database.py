@@ -10,6 +10,7 @@ import threading
 import time
 import fodmap_repo
 
+
 class DatabaseManager():
     def __init__(self, dataDirectory=None, Async=True):
 
@@ -17,7 +18,14 @@ class DatabaseManager():
         self.cachedImages = collections.deque()
 
         self.imagesFolder = dataDirectory
-        self.database = fodmap_repo.database
+
+        databaseFilename = "fodmaplist.json"
+        databaseFilepath = os.path.join(dataDirectory, databaseFilename)
+
+        if not os.path.isfile(databaseFilepath):
+            fodmap_repo.downloadDatabase(databaseFilepath)
+
+        self.database = json.load(open(databaseFilepath))
 
         self.Async = Async
 
